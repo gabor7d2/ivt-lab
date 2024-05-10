@@ -1,7 +1,6 @@
 package hu.bme.mit.spaceship;
 
 import static junit.framework.Assert.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -76,6 +75,57 @@ public class GT4500Test {
         verify(mockTorpedoStore2, times(1)).isEmpty();
         verify(mockTorpedoStore1, times(1)).fire(1);
         verify(mockTorpedoStore2, times(1)).fire(1);
+    }
+
+    @Test
+    public void fireTorpedo_Single_Second_Fire_Success_Secondary_Empty() {
+        // Arrange
+        when(mockTorpedoStore2.isEmpty()).thenReturn(true);
+        when(mockTorpedoStore1.fire(1)).thenReturn(true);
+        when(mockTorpedoStore2.fire(1)).thenReturn(true);
+
+        // Act
+        boolean result = ship.fireTorpedo(FiringMode.SINGLE);
+        boolean result2 = ship.fireTorpedo(FiringMode.SINGLE);
+
+        // Assert
+        assertTrue(result);
+        assertTrue(result2);
+        verify(mockTorpedoStore1, times(2)).isEmpty();
+        verify(mockTorpedoStore2, times(1)).isEmpty();
+        verify(mockTorpedoStore1, times(2)).fire(1);
+        verify(mockTorpedoStore2, times(0)).fire(1);
+    }
+
+    @Test
+    public void fireTorpedo_Single_Second_Fire_Both_Empty_On_Second_Fire() {
+        // Arrange
+        when(mockTorpedoStore1.fire(1)).thenReturn(true);
+        when(mockTorpedoStore2.fire(1)).thenReturn(true);
+
+        // Act
+        boolean result = ship.fireTorpedo(FiringMode.SINGLE);
+
+        // Assert
+        assertTrue(result);
+        verify(mockTorpedoStore1, times(1)).isEmpty();
+        verify(mockTorpedoStore2, times(0)).isEmpty();
+        verify(mockTorpedoStore1, times(1)).fire(1);
+        verify(mockTorpedoStore2, times(0)).fire(1);
+
+        // Arrange
+        when(mockTorpedoStore1.isEmpty()).thenReturn(true);
+        when(mockTorpedoStore2.isEmpty()).thenReturn(true);
+
+        // Act
+        boolean result2 = ship.fireTorpedo(FiringMode.SINGLE);
+
+        // Assert
+        assertFalse(result2);
+        verify(mockTorpedoStore1, times(2)).isEmpty();
+        verify(mockTorpedoStore2, times(1)).isEmpty();
+        verify(mockTorpedoStore1, times(1)).fire(1);
+        verify(mockTorpedoStore2, times(0)).fire(1);
     }
 
     @Test
